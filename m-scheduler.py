@@ -8,6 +8,8 @@ import io
 import email
 from email.message import EmailMessage
 import smtplib
+from dotenv import load_dotenv
+import os
 
 
 # https://stackoverflow.com/a/61157968
@@ -39,8 +41,11 @@ def extract_text(img):
     return text
 
 def send_success_mail(img_text: str):
-    sender = "a.schaufelbuehl@hotmail.com"
-    recipient = "andreas.schaufelbuehl@gmail.com"
+    # sender = "a.schaufelbuehl@hotmail.com"
+    sender = os.getenv('SENDER')
+    recipient = os.getenv('RECEIPIENT')
+    password = os.getenv('PASSWORD')
+    # recipient = "andreas.schaufelbuehl@gmail.com"
 
     email = EmailMessage()
     email["From"] = sender
@@ -50,11 +55,12 @@ def send_success_mail(img_text: str):
 
     smtp = smtplib.SMTP("smtp.office365.com", port=587)
     smtp.starttls()
-    smtp.login(sender, "Vn3975nW8bPRfKW")
+    smtp.login(sender, password)
     smtp.sendmail(sender, recipient, email.as_string())
     smtp.quit()
 
 if __name__ == "__main__":
+    load_dotenv()
     # images = soup.find_all(attrs={'class': 'image lazyloaded'})
     max_tries = 5
     t_count = 0

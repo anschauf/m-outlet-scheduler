@@ -2,8 +2,7 @@ name: run m-outlet-scheduler
 
 on:
   schedule:
-    # - cron: '30 11 * * *' # At 11.30 am
-    - cron: '* * * * *' # At every minute.
+    - cron: '*/2 * * * *' # At every minute.
 
 jobs:
   build:

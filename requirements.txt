@@ -5,3 +5,4 @@ beautifulsoup4
 selenium
 Pillow
 requests
+tesseract-ocr

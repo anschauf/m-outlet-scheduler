@@ -2,7 +2,7 @@ name: run m-outlet-scheduler
 
 on:
   schedule:
-    - cron: '*/2 * * * *' # At every 5th minute.
+    - cron: '*/5 * * * *' # At every 5th minute.
 
 jobs:
   build:

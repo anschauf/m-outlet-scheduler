@@ -41,11 +41,9 @@ def extract_text(img):
     return text
 
 def send_success_mail(img_text: str):
-    # sender = "a.schaufelbuehl@hotmail.com"
-    sender = os.getenv('SENDER')
-    recipient = os.getenv('RECEIPIENT')
-    password = os.getenv('PASSWORD')
-    # recipient = "andreas.schaufelbuehl@gmail.com"
+    sender = os.environ['SENDER']
+    recipient = os.environ['RECEIPIENT']
+    password = os.environ['PASSWORD']
 
     email = EmailMessage()
     email["From"] = sender

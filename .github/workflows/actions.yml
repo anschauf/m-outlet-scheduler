@@ -17,6 +17,8 @@ jobs:
         with:
           python-version: '3.9'
       
+      - name: install tesseract-ocr
+        run: sudo apt-get install tesseract-ocr
       - name: install python packages
         run: |
           python -m pip install --upgrade pip

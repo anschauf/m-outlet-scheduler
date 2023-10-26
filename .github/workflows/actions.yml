@@ -1,8 +1,9 @@
 name: run m-outlet-scheduler
 
-on: push
-  # schedule:
-  #   - cron: '*/5 * * * *' # At every minute.
+# on: push
+on:
+  schedule:
+    - cron: '20 11 * * *' # At 11.20 am
 
 jobs:
   build:

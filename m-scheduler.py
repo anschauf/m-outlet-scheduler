@@ -24,6 +24,12 @@ driver.get("https://zuerich.migros.ch/de/outlet-migros.html")
 content = driver.page_source
 soup = BeautifulSoup(content)
 
+# Mail configs
+sender = os.environ['SENDER']
+recipient = os.environ['RECEIPIENT']
+password = os.environ['PASSWORD']
+app_name = 'M-Outlet Notifier'
+
 
 def extract_text(img):
     base_url = 'https://zuerich.migros.ch'
@@ -41,14 +47,10 @@ def extract_text(img):
     return text
 
 def send_success_mail(img_text: str):
-    sender = os.environ['SENDER']
-    recipient = os.environ['RECEIPIENT']
-    password = os.environ['PASSWORD']
-
     email = EmailMessage()
-    email["From"] = sender
+    email["From"] = app_name
     email["To"] = recipient
-    email["Subject"] = 'M-Outlet Notifier'
+    email["Subject"] = f'{app_name}: Interessante Aktion'
     email.set_content(img_text)
 
     smtp = smtplib.SMTP("smtp.office365.com", port=587)
@@ -57,6 +59,20 @@ def send_success_mail(img_text: str):
     smtp.sendmail(sender, recipient, email.as_string())
     smtp.quit()
 
+def send_failed_mail(e, subject: str):
+    email = EmailMessage()
+    email["From"] = app_name
+    email["To"] = recipient
+    email["Subject"] = f'{app_name}: Exception occured - {subject}'
+    email.set_content(e)
+
+    smtp = smtplib.SMTP("smtp.office365.com", port=587)
+    smtp.starttls()
+    smtp.login(sender, password)
+    smtp.sendmail(sender, recipient, email.as_string())
+    smtp.quit()
+
+
 if __name__ == "__main__":
     load_dotenv()
     # images = soup.find_all(attrs={'class': 'image lazyloaded'})
@@ -64,21 +80,25 @@ if __name__ == "__main__":
     t_count = 0
     success = False
 
-    while t_count <= max_tries:
-        images = soup.find_all('img', attrs={'class': 'image lazyloaded'})
-    
-        if len(images) == 1:
-            img_text = extract_text(images[0])
-            send_success_mail(img_text)
-            # success
-            success = True
-            t_count = max_tries + 1
-        else:
-            t_count += 1
+    try:
+        while success == False and t_count <= max_tries:
+            images = soup.find_all('img', attrs={'class': 'image lazyloaded'})
+        
+            if len(images) == 1:
+                img_text = extract_text(images[0])
+                send_success_mail(img_text)
+                # success
+                success = True
+                t_count = max_tries + 1
+            else:
+                t_count += 1
+    except Exception as e:
+        send_failed_mail(str(e), 'Exception')
+
 
     if not success:
         # send error Email
-        print("Error")
+        send_failed_mail(f'Looped more than {max_tries}', 'Loop end')
 
 
     # sender = "a.schaufelbuehl@hotmail.com"

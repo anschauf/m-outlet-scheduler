@@ -1,7 +1,9 @@
 name: run m-outlet-scheduler
 
-# on: push
 on:
+  push:
+    branches:
+      - "main"
   schedule:
     - cron: '20 11 * * *' # At 11.20 am
 

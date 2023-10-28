@@ -11,6 +11,12 @@ import smtplib
 from dotenv import load_dotenv
 import os
 
+from email.mime.multipart import MIMEMultipart
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+
 
 # https://stackoverflow.com/a/61157968
 chrome_options = Options()
@@ -44,19 +50,39 @@ def extract_text(img):
     image = Image.open(image_file)
     # Perform OCR using PyTesseract
     text = pytesseract.image_to_string(image)
-    return text
+    return text, image
 
-def send_success_mail(img_text: str):
-    email = EmailMessage()
-    email["From"] = app_name
-    email["To"] = recipient
-    email["Subject"] = f'{app_name}: Interessante Aktion'
-    email.set_content(img_text)
+def send_success_mail(img_text: str, img_before):
+    # save image
+    img_before.save('image.png')
+
+
+    msg = MIMEMultipart('alternative')
+
+    msg['Subject'] = "M-Outlet Notifier"
+    msg['From'] = sender
+    msg['To'] = recipient
+
+    text = MIMEText('<img src="cid:image1">', 'html')
+    msg.attach(text)
+
+    image = MIMEImage(open('image.png', 'rb').read())
+
+    # Define the image's ID as referenced in the HTML body above
+    image.add_header('Content-ID', '<image1>')
+    msg.attach(image)
+
+
+    # email = EmailMessage()
+    # email["From"] = app_name
+    # email["To"] = recipient
+    # email["Subject"] = f'{app_name}: Interessante Aktion'
+    # email.set_content(img_text)
 
     smtp = smtplib.SMTP("smtp.office365.com", port=587)
     smtp.starttls()
     smtp.login(sender, password)
-    smtp.sendmail(sender, recipient, email.as_string())
+    smtp.sendmail(sender, recipient, msg.as_string())
     smtp.quit()
 
 def send_failed_mail(e, subject: str):
@@ -85,8 +111,8 @@ if __name__ == "__main__":
             images = soup.find_all('img', attrs={'class': 'image lazyloaded'})
         
             if len(images) == 1:
-                img_text = extract_text(images[0])
-                send_success_mail(img_text)
+                img_text, img = extract_text(images[0])
+                send_success_mail(img_text, img)
                 # success
                 success = True
                 t_count = max_tries + 1

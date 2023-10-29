@@ -75,7 +75,9 @@ def send_success_mail(img_text: str, img_before):
     text = MIMEText(f"""
                     <div>
                         <h1> Interessante Aktion: </h1>
+                        <a href="{base_url}">
                         <img src="cid:image1">
+                        </a>
                     </div>
                     <br>
                     <br>

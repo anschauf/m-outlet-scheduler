@@ -25,8 +25,11 @@ chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--disable-dev-shm-usage')
 driver = webdriver.Chrome(options=chrome_options)
 
+app_name = 'M-Outlet Notifier'
+img_file_path = 'image.png'
+base_url = "https://zuerich.migros.ch/de/outlet-migros.html"
 
-driver.get("https://zuerich.migros.ch/de/outlet-migros.html")
+driver.get(base_url)
 content = driver.page_source
 soup = BeautifulSoup(content)
 
@@ -35,8 +38,7 @@ sender = os.environ['SENDER']
 recipient = os.environ['RECEIPIENT']
 password = os.environ['PASSWORD']
 
-app_name = 'M-Outlet Notifier'
-img_file_path = 'image.png'
+
 
 
 def extract_text(html_image):
@@ -66,11 +68,33 @@ def send_success_mail(img_text: str, img_before):
 
     msg = MIMEMultipart('alternative')
 
-    msg['Subject'] = "M-Outlet Notifier"
+    msg['Subject'] = f"{app_name}: Interessante Aktion"
     msg['From'] = sender
     msg['To'] = recipient
 
-    text = MIMEText('<img src="cid:image1">', 'html')
+    text = MIMEText(f"""
+                    <div>
+                        <h1> Interessante Aktion: </h1>
+                        <img src="cid:image1">
+                    </div>
+                    <br>
+                    <br>
+                    <div>
+                        <h4> Folgende Regel(n) haben angeschlagen: </h4>
+                            <ul>
+                                <li>Eins</li>
+                                <li>fjagagj</li>
+                                <li>bububu</li>
+                            </ul>
+                    </div>
+                    <br>
+                    <div>
+                        <h4> Extrahierter Text: </h4>
+                        <div style="background-color:#6C6C6C ; padding:10px; border-radius: 15px">
+                            {img_text}
+                        </div>
+                    </div>
+                    """, 'html')
     msg.attach(text)
 
     image = MIMEImage(open(img_file_path, 'rb').read())
@@ -83,7 +107,6 @@ def send_success_mail(img_text: str, img_before):
     # email = EmailMessage()
     # email["From"] = app_name
     # email["To"] = recipient
-    # email["Subject"] = f'{app_name}: Interessante Aktion'
     # email.set_content(img_text)
 
     smtp = smtplib.SMTP("smtp.office365.com", port=587)
@@ -137,25 +160,6 @@ if __name__ == "__main__":
         # send error Email
         send_failed_mail(f'Looped more than {max_tries}', 'Loop end')
 
-
-    # sender = "a.schaufelbuehl@hotmail.com"
-    # recipient = "andreas.schaufelbuehl@gmail.com"
-    # message = "Hello world!"
-
-    # content = text.replace("\n", "")
-
-
-    # email = EmailMessage()
-    # email["From"] = sender
-    # email["To"] = recipient
-    # email["Subject"] = 'M-Outlet Notifier'
-    # email.set_content(text)
-
-    # smtp = smtplib.SMTP("smtp.office365.com", port=587)
-    # smtp.starttls()
-    # smtp.login(sender, "Vn3975nW8bPRfKW")
-    # smtp.sendmail(sender, recipient, email.as_string())
-    # smtp.quit()
     clean_up()
     print("Done")
 

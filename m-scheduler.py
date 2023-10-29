@@ -46,16 +46,16 @@ reges_rules = [
     'spiel',
     'lego',
 
-    # testing
-    # 'glih',
-    # 'ochen',
+    ## testing
+    'glih',
+    'ochen',
 ]
 
 
 
 def extract_text(html_image):
-    base_url = 'https://zuerich.migros.ch'
-    image_url_small = base_url + html_image['src']
+    image_base_url = 'https://zuerich.migros.ch'
+    image_url_small = image_base_url + html_image['src']
     # replace 'small' with 'large' in URL
     image_url_big = image_url_small.replace('small', 'large', 1)
 
@@ -163,37 +163,35 @@ def clean_up():
 
 if __name__ == "__main__":
     load_dotenv()
-    # images = soup.find_all(attrs={'class': 'image lazyloaded'})
     max_tries = 5
     t_count = 0
-    success = False
 
-    try:
-        while success == False and t_count <= max_tries:
-            html_images = soup.find_all('img', attrs={'class': 'image lazyloaded'})
-        
-            if len(html_images) == 1:
+    image_scrape_success = False
+
+    while t_count < max_tries:
+        html_images = soup.find_all('img', attrs={'class': 'image lazyloaded'})
+
+        if len(html_images) == 1:
+            # Image found
+            image_scrape_success = True
+            try:
                 img_text, image_big, image_small = extract_text(html_images[0])
                 matching_regex = find_regex_rules(img_text)
 
                 if len(matching_regex) > 0:
-                    # success
-                    success = True
-                    t_count = max_tries + 1
+                    # Matching rule found
                     send_success_mail(img_text, image_small, matching_regex)
-
-                else:
-                    break
-            else:
-                t_count += 1
-            
-        if not success:
-            # send error Email
-            send_failed_mail(f'Looped more than {max_tries}', 'Loop end')
-
-    except Exception as e:
-        send_failed_mail(str(e), 'Exception')
-
+                    
+  
+                t_count = max_tries
+            except Exception as e:
+                send_failed_mail(str(e), 'Exception')
+                t_count = max_tries
+        else:
+            t_count += 1
+    
+    if not image_scrape_success and t_count >= max_tries:
+        send_failed_mail(f'Looped more than {max_tries}', 'Loop end')
 
     clean_up()
     print("Done")

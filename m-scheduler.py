@@ -34,27 +34,34 @@ soup = BeautifulSoup(content)
 sender = os.environ['SENDER']
 recipient = os.environ['RECEIPIENT']
 password = os.environ['PASSWORD']
+
 app_name = 'M-Outlet Notifier'
+img_file_path = 'image.png'
 
 
-def extract_text(img):
+def extract_text(html_image):
     base_url = 'https://zuerich.migros.ch'
-    image_url = base_url + img['src']
+    image_url_small = base_url + html_image['src']
     # replace 'small' with 'large' in URL
-    image_url_big = image_url.replace('small', 'large', 1)
+    image_url_big = image_url_small.replace('small', 'large', 1)
 
-    image_content = requests.get(image_url_big).content
-    image_file = io.BytesIO(image_content)
+    image_content_big = requests.get(image_url_big).content
+    image_file_big = io.BytesIO(image_content_big)
+
+    image_content_small = requests.get(image_url_small).content
+    image_file_small = io.BytesIO(image_content_small)
 
     # Extract the text from the image
-    image = Image.open(image_file)
+    image_big = Image.open(image_file_big)
+    image_small = Image.open(image_file_small)
+
     # Perform OCR using PyTesseract
-    text = pytesseract.image_to_string(image)
-    return text, image
+    text = pytesseract.image_to_string(image_big)
+    return text, image_big, image_small 
 
 def send_success_mail(img_text: str, img_before):
     # save image
-    img_before.save('image.png')
+    img_before.save(img_file_path)
 
 
     msg = MIMEMultipart('alternative')
@@ -66,7 +73,7 @@ def send_success_mail(img_text: str, img_before):
     text = MIMEText('<img src="cid:image1">', 'html')
     msg.attach(text)
 
-    image = MIMEImage(open('image.png', 'rb').read())
+    image = MIMEImage(open(img_file_path, 'rb').read())
 
     # Define the image's ID as referenced in the HTML body above
     image.add_header('Content-ID', '<image1>')
@@ -98,6 +105,10 @@ def send_failed_mail(e, subject: str):
     smtp.sendmail(sender, recipient, email.as_string())
     smtp.quit()
 
+def clean_up():
+    os.remove(img_file_path)
+    
+
 
 if __name__ == "__main__":
     load_dotenv()
@@ -108,11 +119,11 @@ if __name__ == "__main__":
 
     try:
         while success == False and t_count <= max_tries:
-            images = soup.find_all('img', attrs={'class': 'image lazyloaded'})
+            html_images = soup.find_all('img', attrs={'class': 'image lazyloaded'})
         
-            if len(images) == 1:
-                img_text, img = extract_text(images[0])
-                send_success_mail(img_text, img)
+            if len(html_images) == 1:
+                img_text, image_big, image_small = extract_text(html_images[0])
+                send_success_mail(img_text, image_small)
                 # success
                 success = True
                 t_count = max_tries + 1
@@ -145,5 +156,6 @@ if __name__ == "__main__":
     # smtp.login(sender, "Vn3975nW8bPRfKW")
     # smtp.sendmail(sender, recipient, email.as_string())
     # smtp.quit()
+    clean_up()
     print("Done")
 

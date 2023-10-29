@@ -1,15 +1,17 @@
+import os
+import io
+import re
+import requests
+import pytesseract
+import smtplib
+
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-import pytesseract
 from PIL import Image
 from bs4 import BeautifulSoup
-import requests
-import io
-import email
 from email.message import EmailMessage
-import smtplib
 from dotenv import load_dotenv
-import os
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
@@ -39,6 +41,16 @@ recipient = os.environ['RECEIPIENT']
 password = os.environ['PASSWORD']
 
 
+# regex rules
+reges_rules = [
+    'spiel',
+    'lego',
+
+    # testing
+    # 'glih',
+    # 'ochen',
+]
+
 
 
 def extract_text(html_image):
@@ -61,7 +73,7 @@ def extract_text(html_image):
     text = pytesseract.image_to_string(image_big)
     return text, image_big, image_small 
 
-def send_success_mail(img_text: str, img_before):
+def send_success_mail(img_text: str, img_before, matching_regex):
     # save image
     img_before.save(img_file_path)
 
@@ -71,6 +83,10 @@ def send_success_mail(img_text: str, img_before):
     msg['Subject'] = f"{app_name}: Interessante Aktion"
     msg['From'] = sender
     msg['To'] = recipient
+
+    regex_rules_msg = ''
+    for mr in matching_regex:
+        regex_rules_msg += f'<li>{mr}</li>'
 
     text = MIMEText(f"""
                     <div>
@@ -84,9 +100,7 @@ def send_success_mail(img_text: str, img_before):
                     <div>
                         <h4> Folgende Regel(n) haben angeschlagen: </h4>
                             <ul>
-                                <li>Eins</li>
-                                <li>fjagagj</li>
-                                <li>bububu</li>
+                                {regex_rules_msg}
                             </ul>
                     </div>
                     <br>
@@ -130,8 +144,20 @@ def send_failed_mail(e, subject: str):
     smtp.sendmail(sender, recipient, email.as_string())
     smtp.quit()
 
+
+def find_regex_rules(extracted_text):
+    matches = []
+
+    for rr in reges_rules:
+        match = re.search(rr, extracted_text, re.IGNORECASE)
+        if match:
+            matches.append(rr)
+    
+    return matches
+
 def clean_up():
-    os.remove(img_file_path)
+    if os.path.exists(img_file_path):
+        os.remove(img_file_path)
     
 
 
@@ -148,19 +174,26 @@ if __name__ == "__main__":
         
             if len(html_images) == 1:
                 img_text, image_big, image_small = extract_text(html_images[0])
-                send_success_mail(img_text, image_small)
-                # success
-                success = True
-                t_count = max_tries + 1
+                matching_regex = find_regex_rules(img_text)
+
+                if len(matching_regex) > 0:
+                    # success
+                    success = True
+                    t_count = max_tries + 1
+                    send_success_mail(img_text, image_small, matching_regex)
+
+                else:
+                    break
             else:
                 t_count += 1
+            
+        if not success:
+            # send error Email
+            send_failed_mail(f'Looped more than {max_tries}', 'Loop end')
+
     except Exception as e:
         send_failed_mail(str(e), 'Exception')
 
-
-    if not success:
-        # send error Email
-        send_failed_mail(f'Looped more than {max_tries}', 'Loop end')
 
     clean_up()
     print("Done")

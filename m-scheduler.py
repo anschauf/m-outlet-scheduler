@@ -3,21 +3,14 @@ import io
 import re
 import requests
 import pytesseract
-import smtplib
-
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from PIL import Image
 from bs4 import BeautifulSoup
-from email.message import EmailMessage
 from dotenv import load_dotenv
 
-from email.mime.multipart import MIMEMultipart
-from email.mime.image import MIMEImage
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.image import MIMEImage
+from emailService import send_success_mail, send_failed_mail
 
 
 # https://stackoverflow.com/a/61157968
@@ -35,10 +28,6 @@ driver.get(base_url)
 content = driver.page_source
 soup = BeautifulSoup(content)
 
-# Mail configs
-sender = os.environ['SENDER']
-recipient = os.environ['RECEIPIENT']
-password = os.environ['PASSWORD']
 
 
 # regex rules
@@ -72,77 +61,6 @@ def extract_text(html_image):
     # Perform OCR using PyTesseract
     text = pytesseract.image_to_string(image_big)
     return text, image_big, image_small 
-
-def send_success_mail(img_text: str, img_before, matching_regex):
-    # save image
-    img_before.save(img_file_path)
-
-
-    msg = MIMEMultipart('alternative')
-
-    msg['Subject'] = f"{app_name}: Interessante Aktion"
-    msg['From'] = sender
-    msg['To'] = recipient
-
-    regex_rules_msg = ''
-    for mr in matching_regex:
-        regex_rules_msg += f'<li>{mr}</li>'
-
-    text = MIMEText(f"""
-                    <div>
-                        <h1> Interessante Aktion: </h1>
-                        <a href="{base_url}">
-                        <img src="cid:image1">
-                        </a>
-                    </div>
-                    <br>
-                    <br>
-                    <div>
-                        <h4> Folgende Regel(n) haben angeschlagen: </h4>
-                            <ul>
-                                {regex_rules_msg}
-                            </ul>
-                    </div>
-                    <br>
-                    <div>
-                        <h4> Extrahierter Text: </h4>
-                        <div style="background-color:#6C6C6C ; padding:10px; border-radius: 15px">
-                            {img_text}
-                        </div>
-                    </div>
-                    """, 'html')
-    msg.attach(text)
-
-    image = MIMEImage(open(img_file_path, 'rb').read())
-
-    # Define the image's ID as referenced in the HTML body above
-    image.add_header('Content-ID', '<image1>')
-    msg.attach(image)
-
-
-    # email = EmailMessage()
-    # email["From"] = app_name
-    # email["To"] = recipient
-    # email.set_content(img_text)
-
-    smtp = smtplib.SMTP("smtp.office365.com", port=587)
-    smtp.starttls()
-    smtp.login(sender, password)
-    smtp.sendmail(sender, recipient, msg.as_string())
-    smtp.quit()
-
-def send_failed_mail(e, subject: str):
-    email = EmailMessage()
-    email["From"] = app_name
-    email["To"] = recipient
-    email["Subject"] = f'{app_name}: Exception occured - {subject}'
-    email.set_content(e)
-
-    smtp = smtplib.SMTP("smtp.office365.com", port=587)
-    smtp.starttls()
-    smtp.login(sender, password)
-    smtp.sendmail(sender, recipient, email.as_string())
-    smtp.quit()
 
 
 def find_regex_rules(extracted_text):
@@ -180,7 +98,7 @@ if __name__ == "__main__":
 
                 if len(matching_regex) > 0:
                     # Matching rule found
-                    send_success_mail(img_text, image_small, matching_regex)
+                    send_success_mail(app_name, img_file_path, base_url, img_text, image_small, matching_regex)
                     
   
                 t_count = max_tries
@@ -191,7 +109,7 @@ if __name__ == "__main__":
             t_count += 1
     
     if not image_scrape_success and t_count >= max_tries:
-        send_failed_mail(f'Looped more than {max_tries}', 'Loop end')
+        send_failed_mail(f'Looped more than {max_tries}', 'Loop end', app_name)
 
     clean_up()
     print("Done")

@@ -3,8 +3,6 @@ import io
 import re
 import requests
 import pytesseract
-import json
-import ast
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -125,7 +123,8 @@ if __name__ == "__main__":
                         # Matching rule found
                         send_success_mail(app_name, img_file_path, base_url, img_text, image_small, matching_regex)
                     
-                    googleDriveService.append_new_image_data(image_url_small, img_text, matching_regex)
+                    img_filename = googleDriveService.upload_image(local_img_path=img_file_path, img=image_big, image_url_small=image_url_small)
+                    googleDriveService.append_new_image_data(image_url_small, img_text, matching_regex, img_filename)
                     t_count = max_tries
                 except Exception as e:
                     send_failed_mail(str(e), 'Exception')

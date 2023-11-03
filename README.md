@@ -14,3 +14,4 @@
 ## Links
 - [Python: Read a Google Sheet file](https://www.youtube.com/watch?v=82DGz7IxW7c)
 - [GSpread Usage Documentation](https://docs.gspread.org/en/latest/user-guide.html)
+- [Youtube - Upload files to Google Drive (old)](https://www.youtube.com/watch?v=cCKPjW5JwKo)

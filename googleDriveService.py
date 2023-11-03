@@ -1,10 +1,11 @@
 import os
-import io
+import re
 from googleapiclient.discovery import build
-from googleapiclient.http import MediaIoBaseDownload
+from googleapiclient.http import MediaFileUpload
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
-from datetime import date
+from datetime import date, datetime
+
 
 g_spread_file_name = 'm_outlet_actions'
 
@@ -29,6 +30,7 @@ class GoogleDriveService:
 
         creds = ServiceAccountCredentials._from_parsed_json_keyfile(g_credentials, self._SCOPES)
         self.client = gspread.authorize(creds)
+        self.service = build('drive', 'v3', credentials=creds)
 
         
         # service = build('drive', 'v3', credentials=creds)
@@ -46,7 +48,7 @@ class GoogleDriveService:
             print(f'Error accessing Google Spread file {filename}')
 
 
-    def append_new_image_data(self, image_url_small, img_text, matching_regex):
+    def append_new_image_data(self, image_url_small, img_text, matching_regex, img_filename):
         today_date = str(date.today())
 
         if len(matching_regex) > 0:
@@ -59,9 +61,10 @@ class GoogleDriveService:
         rows = mysheet.get_all_records()
         latest_end_date = rows[-1]['end_date']
         old_id = rows[-1]['id']
+        curr_id = old_id + 1
 
         clean_img_text = img_text.replace(',', ';')
-        body = [str(old_id + 1), today_date, '', image_url_small, clean_img_text, str(has_matches), str(matching_regex)]
+        body = [str(curr_id), today_date, '', image_url_small, clean_img_text, str(has_matches), str(matching_regex), img_filename]
 
 
 
@@ -73,6 +76,31 @@ class GoogleDriveService:
         mysheet.append_row(body)
         # mysheet.append_row(body, table_range="A1:F1")
         print('Wrote new image data to GSpread file.')
+
+        return curr_id
     
-    # def upload_image(self, img, image_url_small):
+    def upload_image(self, local_img_path, img, image_url_small):
+        try:
+            # Save image
+            img.save(local_img_path)
+
+            # add leading zeros
+            # id_str = str(id).zfill(3)
+            curr_date = datetime.now()
+            now_year = curr_date.strftime("%Y")
+            kw = re.search('(KW\d\d).\w{3}', image_url_small).group(0)
+
+            file_name = f'm_outlet_{now_year}_{kw}'
+            file_metadata = {'name': file_name, 'parents': ['1jZVjFRNQRI2fZ-iU6B0XiPo3RLiCfftI']}
+
+            mime_type = f'image/{kw[-3:]}'
+            media = MediaFileUpload(local_img_path, mimetype=mime_type)
+
+            # Upload to Google Drive
+            file = self.service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+            print(f"Image with ID '{file.get('id')}' was uploaded to the folder with ID  on Google Drive")
+            return file_name
+        except Exception as e:
+            return f'Upload image to Google drive failed with: {e}'
+
         

@@ -1,0 +1,2 @@
+start_date,end_date,image_url,extracted_text,interesting_action,matched_rules
+2023-10-16,2023-10-22,https://test-example-url.ch,Wochenhit  Cie ae Near  Alle Varta Batterien erhaltlich in diversen Sorten; z.B. AA; 16 Stick; pro Pack  13.-  IT eT eed              oy ha lays MIGROS  Migros Spielwaren erhaltlich in diversen Sorten z.B. Gravitrax; pro Stuck  23.80 statt 119.-,True,['spiel']

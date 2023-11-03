@@ -32,5 +32,10 @@ jobs:
           SENDER: ${{ secrets.SENDER }}
           RECEIPIENT: ${{ secrets.RECEIPIENT }}
           PASSWORD: ${{ secrets.PASSWORD }}
+          GD_PROJECT_ID: ${{ secrets.GD_PROJECT_ID }}
+          GD_PRIVATE_KEY_ID: ${{ secrets.GD_PRIVATE_KEY_ID }}
+          GD_PRIVATE_KEY: ${{ secrets.GD_PRIVATE_KEY }}
+          GD_CLIENT_EMAIL: ${{ secrets.GD_CLIENT_EMAIL }}
+          GD_CLIENT_ID: ${{ secrets.GD_CLIENT_ID }}
         run: python m-scheduler.py
       

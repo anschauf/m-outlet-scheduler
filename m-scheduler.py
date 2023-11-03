@@ -3,6 +3,8 @@ import io
 import re
 import requests
 import pytesseract
+import json
+import ast
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -11,6 +13,7 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
 from emailService import send_success_mail, send_failed_mail
+from googleDriveService import GoogleDriveService
 
 
 # https://stackoverflow.com/a/61157968
@@ -23,6 +26,7 @@ driver = webdriver.Chrome(options=chrome_options)
 app_name = 'M-Outlet Notifier'
 img_file_path = 'image.png'
 base_url = "https://zuerich.migros.ch/de/outlet-migros.html"
+image_base_url = 'https://zuerich.migros.ch'
 
 driver.get(base_url)
 content = driver.page_source
@@ -43,7 +47,6 @@ reges_rules = [
 
 
 def extract_text(html_image):
-    image_base_url = 'https://zuerich.migros.ch'
     image_url_small = image_base_url + html_image['src']
     # replace 'small' with 'large' in URL
     image_url_big = image_url_small.replace('small', 'large', 1)
@@ -81,6 +84,22 @@ def clean_up():
 
 if __name__ == "__main__":
     load_dotenv()
+
+    googleDriveService = GoogleDriveService()
+
+    # selected_fields="files(id,name,webViewLink)"
+    # list_file=gdriveService.files().list(fields=selected_fields).execute()
+
+    # Get latest stored image_url
+    # get new image url
+    # 
+
+    gd_latest_image_url = googleDriveService.get_latest_image_url('1FNzPArr137RIT_kW_70m2l68S7kxKC8kp51tCeM8mOU')
+    # curr_image_url =
+    print()
+
+
+
     max_tries = 5
     t_count = 0
 
@@ -92,18 +111,27 @@ if __name__ == "__main__":
         if len(html_images) == 1:
             # Image found
             image_scrape_success = True
-            try:
-                img_text, image_big, image_small = extract_text(html_images[0])
-                matching_regex = find_regex_rules(img_text)
+            html_image = html_images[0]
+            image_url_small = image_base_url + html_image['src']
 
-                if len(matching_regex) > 0:
-                    # Matching rule found
-                    send_success_mail(app_name, img_file_path, base_url, img_text, image_small, matching_regex)
+            if gd_latest_image_url != image_url_small:
+                print(f'Found new image on the website with URL: {image_url_small}')
+
+                try:
+                    img_text, image_big, image_small = extract_text(html_image)
+                    matching_regex = find_regex_rules(img_text)
+
+                    if len(matching_regex) > 0:
+                        # Matching rule found
+                        send_success_mail(app_name, img_file_path, base_url, img_text, image_small, matching_regex)
                     
-  
-                t_count = max_tries
-            except Exception as e:
-                send_failed_mail(str(e), 'Exception')
+                    googleDriveService.append_new_image_data(image_url_small, img_text, matching_regex)
+                    t_count = max_tries
+                except Exception as e:
+                    send_failed_mail(str(e), 'Exception')
+                    t_count = max_tries
+            else:
+                print("The image found is already logged.")
                 t_count = max_tries
         else:
             t_count += 1

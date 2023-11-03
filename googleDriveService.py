@@ -54,13 +54,16 @@ class GoogleDriveService:
         else:
             has_matches = False
 
-        clean_img_text = img_text.replace(',', ';')
-        body = [today_date, '', image_url_small, clean_img_text, str(has_matches), str(matching_regex)]
 
         mysheet = self.client.open(g_spread_file_name).sheet1
-        
         rows = mysheet.get_all_records()
         latest_end_date = rows[-1]['end_date']
+        old_id = rows[-1]['id']
+
+        clean_img_text = img_text.replace(',', ';')
+        body = [str(old_id + 1), today_date, '', image_url_small, clean_img_text, str(has_matches), str(matching_regex)]
+
+
 
         # Update the end date of the old action, if empty.
         if len(latest_end_date) <= 0:
@@ -70,3 +73,6 @@ class GoogleDriveService:
         mysheet.append_row(body)
         # mysheet.append_row(body, table_range="A1:F1")
         print('Wrote new image data to GSpread file.')
+    
+    # def upload_image(self, img, image_url_small):
+        

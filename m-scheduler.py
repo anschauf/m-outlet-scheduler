@@ -39,7 +39,7 @@ reges_rules = [
 
     ## testing
     'glih',
-    'ochen',
+    # 'ochen',
 ]
 
 

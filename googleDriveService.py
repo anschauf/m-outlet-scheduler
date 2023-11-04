@@ -7,7 +7,6 @@ import gspread
 from datetime import date, datetime
 
 
-g_spread_file_name = 'm_outlet_actions'
 
 class GoogleDriveService:
     def __init__(self):
@@ -32,6 +31,9 @@ class GoogleDriveService:
         self.client = gspread.authorize(creds)
         self.service = build('drive', 'v3', credentials=creds)
 
+        self.g_spread_file_name = 'm_outlet_actions'
+        self.gdrive_img_folder = os.environ['GD_IMAGE_FOLDER_ID']
+
         
         # service = build('drive', 'v3', credentials=creds)
         # self.service = service
@@ -39,7 +41,7 @@ class GoogleDriveService:
     
     def get_latest_image_url(self, filename):
         try:
-            mysheet = self.client.open(g_spread_file_name).sheet1
+            mysheet = self.client.open(self.g_spread_file_name).sheet1
 
             rows = mysheet.get_all_records()
 
@@ -57,14 +59,14 @@ class GoogleDriveService:
             has_matches = False
 
 
-        mysheet = self.client.open(g_spread_file_name).sheet1
+        mysheet = self.client.open(self.g_spread_file_name).sheet1
         rows = mysheet.get_all_records()
         latest_end_date = rows[-1]['end_date']
         old_id = rows[-1]['id']
         curr_id = old_id + 1
 
-        clean_img_text = img_text.replace(',', ';')
-        body = [str(curr_id), today_date, '', image_url_small, clean_img_text, str(has_matches), str(matching_regex), img_filename]
+        clean_img_text = img_text.replace(',', ';').replace('\n', '  ')
+        body = [str(curr_id), today_date, '', image_url_small, str(has_matches), str(matching_regex), img_filename, clean_img_text]
 
 
 
@@ -91,7 +93,7 @@ class GoogleDriveService:
             kw = re.search('(KW\d\d).\w{3}', image_url_small).group(0)
 
             file_name = f'm_outlet_{now_year}_{kw}'
-            file_metadata = {'name': file_name, 'parents': ['1jZVjFRNQRI2fZ-iU6B0XiPo3RLiCfftI']}
+            file_metadata = {'name': file_name, 'parents': [self.gdrive_img_folder]}
 
             mime_type = f'image/{kw[-3:]}'
             media = MediaFileUpload(local_img_path, mimetype=mime_type)

@@ -37,5 +37,6 @@ jobs:
           GD_PRIVATE_KEY: ${{ secrets.GD_PRIVATE_KEY }}
           GD_CLIENT_EMAIL: ${{ secrets.GD_CLIENT_EMAIL }}
           GD_CLIENT_ID: ${{ secrets.GD_CLIENT_ID }}
+          GD_IMAGE_FOLDER_ID: ${{ secrets.GD_IMAGE_FOLDER_ID }}
         run: python m-scheduler.py
       

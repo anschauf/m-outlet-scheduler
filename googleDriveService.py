@@ -16,7 +16,7 @@ class GoogleDriveService:
         self._SCOPES=['https://www.googleapis.com/auth/drive']
 
         gd_project_id = os.environ['GD_PROJECT_ID']
-        pd_private_key_id = 'c006e3879b527533a734a794ddf1a140fa10b034'
+        pd_private_key_id = os.environ['GD_PRIVATE_KEY_ID']
         gd_private_key = os.environ['GD_PRIVATE_KEY']
         gd_client_email = os.environ['GD_CLIENT_EMAIL']
         gd_client_id = os.environ['GD_CLIENT_ID']

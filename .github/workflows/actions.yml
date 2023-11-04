@@ -33,8 +33,8 @@ jobs:
           RECEIPIENT: ${{ secrets.RECEIPIENT }}
           PASSWORD: ${{ secrets.PASSWORD }}
           GD_PROJECT_ID: ${{ secrets.GD_PROJECT_ID }}
-          GD_PRIVATE_KEY_ID: ${{ secrets.GD_PRIVATE_KEY_ID }}
-          GD_PRIVATE_KEY: ${{ secrets.GD_PRIVATE_KEY }}
+          GD_PRIVATE_KEY_ID: ${{ variables.GD_PRIVATE_KEY_ID }}
+          GD_PRIVATE_KEY: ${{ variables.GD_PRIVATE_KEY }}
           GD_CLIENT_EMAIL: ${{ secrets.GD_CLIENT_EMAIL }}
           GD_CLIENT_ID: ${{ secrets.GD_CLIENT_ID }}
           GD_IMAGE_FOLDER_ID: ${{ secrets.GD_IMAGE_FOLDER_ID }}

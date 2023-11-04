@@ -13,11 +13,11 @@ class GoogleDriveService:
         self._SCOPES=['https://www.googleapis.com/auth/drive']
 
 
-        print('GD_PROJECT_ID: ' + os.environ('GD_PROJECT_ID'))
-        print('GD_PRIVATE_KEY_ID: ' + os.environ('GD_PRIVATE_KEY_ID'))
-        print('GD_PRIVATE_KEY: ' + os.environ('GD_PRIVATE_KEY'))
-        print('GD_CLIENT_EMAIL: ' + os.environ('GD_CLIENT_EMAIL'))
-        print('GD_CLIENT_ID: ' + os.environ('GD_CLIENT_ID'))
+        print('GD_PROJECT_ID: ' + os.environ['GD_PROJECT_ID'])
+        print('GD_PRIVATE_KEY_ID: ' + os.environ['GD_PRIVATE_KEY_ID'])
+        print('GD_PRIVATE_KEY: ' + os.environ['GD_PRIVATE_KEY'])
+        print('GD_CLIENT_EMAIL: ' + os.environ['GD_CLIENT_EMAIL'])
+        print('GD_CLIENT_ID: ' + os.environ['GD_CLIENT_ID'])
               
         # Credentials read from environment variables
         g_credentials = {

@@ -16,16 +16,11 @@ class GoogleDriveService:
         self._SCOPES=['https://www.googleapis.com/auth/drive']
 
         gd_project_id = os.environ['GD_PROJECT_ID']
-        pd_private_key_id = os.environ['GD_PRIVATE_KEY_ID']
-        gd_private_key = os.environ['GD_PRIVATE_KEY']
+        pd_private_key_id = 'c006e3879b527533a734a794ddf1a140fa10b034'
+        gd_private_key = '-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCZ+8LYV5stQcbr\nWtpI00vf4nbXXkw9AuhMerHfZa2s8HKSJrw/AriU0KodLqGN8yn1TzyCr0tRttsx\n2lboJEJHeyjuO/vYbZwt1SuUfyDT/r7SWUjTPaGOzfN3Yhmn9qDrQMVM9HOf21Gl\nsSsugwI9KMwBg0yAh9JfVQ5nOj2OhD3EIbFHyf5Sz3NRdPhzCdGemnbxAw60zhdH\nLh1kVno1Vjj/71skE5aUyiAmRxXUH2avtqCOHqMrLJPF3TTXPvAS0Wcw3BLCSb+i\nbzTMFCr+PXghwMuo4d3bBhZBg8eiI67v6bIWWKA1ztdDrc5oTQU+00p8A7EpKwnT\ntU1pVKC1AgMBAAECggEAFt2v/Xhk7r+JzoFbUN0vsztp8mlqYNUBsfm2WDo9JCVA\nnjtqUOESj+a8nEDEdNPbMzZlAfMN+EBzJGAL78USopLDbT0zFNySCKxTIGYQdeqq\nY4omqlfImfAza1MCBFM3ajfgFKFoWiCzayt4AhwqRPK9+KuKvLtungF/dgzL/1Gg\n6p+goX9N6yRYnNVfh1Ab4VTIk5whGlgeUpbtSksDXGs25J0ArjKobihXr8CJEuJZ\nWMaeJ023HizZckYYPt9lLnfZvOiOsqlU0qHjeMSqI3pU+RO1QUB3BklLbOSPfjFY\nyLkZJn1XCr0XV57smfs9XQoubbpdO20hxYkMcrzTMQKBgQDNOcuP0iWCzeBy28x9\nWqBC8tamW4mz+y/jBeOmtjeN/p3f5hyWaN0vKRZplzAg7yFj5mqXO/WHCixwF682\nK5tZsjhuVewj/fJ0TCuR+NDdSaAYgNY2KapYhVMnXx/9C8cGTqRjeCqWXZOcXVOj\nReHxMvV8g51TjnsJTrN6gcmbwwKBgQDAFHnR4jssOW5t9mUhbhIkC5pO1mBLFmPK\nH0Wga50koGX6njFTvwSQ2xwK8Vv1ioSvr4TiIOvO5n/H86MJzF8xbCUDrEOytPpm\nEFOt6J5z5YeUx7l9e0dL6uRyWgZzf4HUCAVjrDa7PkqJleeUA82vw7KSu+ColDT3\n7TSytnoiJwKBgCESPDR79+GBTbcUpnpY3VSMj3yVabZgNxJNg6b83Cz8p/JJwbeX\nRHVyGJOBcpcMEgRoQCsI1YMiZ5DUsD55fnpQ1vkozXnrVWPaVncacoYGdE8ei+aE\nhlfnfEPu91euyy7AA4un9KzwfXYIMA8ylrtoq9iZ2QN7BWa1kQSf355DAoGAQbo/\n/Vwm13lHmoVIEepydrcptHSTOt6Mgyu0TbLFcTUZ8GqVgozI6TCxJeV1jE48HUo4\ndJDDYGdrrmZmkgHHSUgyWlFmUQ6w6KAJomcJYatXe8fkZ1X6DbZxOdgogPlO2dls\nzrCtgeFM7EvJlNLAXbbfsmpr9APTJEudTtI2dN0CgYBNLDgYlbCSfsBpJl9isMQN\nMEU46AG0w7BAtEX57AgNX5NTyKbmAjIvvBWLTL7kK9aQGMihGuinqABFBEHHBHq/\nDGXxkIEpEliA8vV0hRMuJmjh7Vv399wflQ//CoehpK45QRlluuzXB9L8/quHgJjR\nZlrkz2XuX5Jc/CvZZMrhhQ==\n-----END PRIVATE KEY-----\n'
         gd_client_email = os.environ['GD_CLIENT_EMAIL']
         gd_client_id = os.environ['GD_CLIENT_ID']
 
-        print('GD_PROJECT_ID: ' + gd_project_id)
-        print('GD_PRIVATE_KEY_ID: ' + pd_private_key_id)
-        print('GD_PRIVATE_KEY: ' + gd_private_key)
-        print('GD_CLIENT_EMAIL: ' + gd_client_email)
-        print('GD_CLIENT_ID: ' + gd_client_id)
               
         # Credentials read from environment variables
         g_credentials = {
@@ -41,20 +36,6 @@ class GoogleDriveService:
             "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/m-outlet-executor%40m-outlet-notifier.iam.gserviceaccount.com",
             "universe_domain": "googleapis.com"
         }
-
-        # g_credentials = {
-        #     "type": "service_account",
-        #     "project_id": 'm-outlet-notifier',
-        #     "private_key_id": 'c006e3879b527533a734a794ddf1a140fa10b034',
-        #     "private_key": '-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCZ+8LYV5stQcbr\nWtpI00vf4nbXXkw9AuhMerHfZa2s8HKSJrw/AriU0KodLqGN8yn1TzyCr0tRttsx\n2lboJEJHeyjuO/vYbZwt1SuUfyDT/r7SWUjTPaGOzfN3Yhmn9qDrQMVM9HOf21Gl\nsSsugwI9KMwBg0yAh9JfVQ5nOj2OhD3EIbFHyf5Sz3NRdPhzCdGemnbxAw60zhdH\nLh1kVno1Vjj/71skE5aUyiAmRxXUH2avtqCOHqMrLJPF3TTXPvAS0Wcw3BLCSb+i\nbzTMFCr+PXghwMuo4d3bBhZBg8eiI67v6bIWWKA1ztdDrc5oTQU+00p8A7EpKwnT\ntU1pVKC1AgMBAAECggEAFt2v/Xhk7r+JzoFbUN0vsztp8mlqYNUBsfm2WDo9JCVA\nnjtqUOESj+a8nEDEdNPbMzZlAfMN+EBzJGAL78USopLDbT0zFNySCKxTIGYQdeqq\nY4omqlfImfAza1MCBFM3ajfgFKFoWiCzayt4AhwqRPK9+KuKvLtungF/dgzL/1Gg\n6p+goX9N6yRYnNVfh1Ab4VTIk5whGlgeUpbtSksDXGs25J0ArjKobihXr8CJEuJZ\nWMaeJ023HizZckYYPt9lLnfZvOiOsqlU0qHjeMSqI3pU+RO1QUB3BklLbOSPfjFY\nyLkZJn1XCr0XV57smfs9XQoubbpdO20hxYkMcrzTMQKBgQDNOcuP0iWCzeBy28x9\nWqBC8tamW4mz+y/jBeOmtjeN/p3f5hyWaN0vKRZplzAg7yFj5mqXO/WHCixwF682\nK5tZsjhuVewj/fJ0TCuR+NDdSaAYgNY2KapYhVMnXx/9C8cGTqRjeCqWXZOcXVOj\nReHxMvV8g51TjnsJTrN6gcmbwwKBgQDAFHnR4jssOW5t9mUhbhIkC5pO1mBLFmPK\nH0Wga50koGX6njFTvwSQ2xwK8Vv1ioSvr4TiIOvO5n/H86MJzF8xbCUDrEOytPpm\nEFOt6J5z5YeUx7l9e0dL6uRyWgZzf4HUCAVjrDa7PkqJleeUA82vw7KSu+ColDT3\n7TSytnoiJwKBgCESPDR79+GBTbcUpnpY3VSMj3yVabZgNxJNg6b83Cz8p/JJwbeX\nRHVyGJOBcpcMEgRoQCsI1YMiZ5DUsD55fnpQ1vkozXnrVWPaVncacoYGdE8ei+aE\nhlfnfEPu91euyy7AA4un9KzwfXYIMA8ylrtoq9iZ2QN7BWa1kQSf355DAoGAQbo/\n/Vwm13lHmoVIEepydrcptHSTOt6Mgyu0TbLFcTUZ8GqVgozI6TCxJeV1jE48HUo4\ndJDDYGdrrmZmkgHHSUgyWlFmUQ6w6KAJomcJYatXe8fkZ1X6DbZxOdgogPlO2dls\nzrCtgeFM7EvJlNLAXbbfsmpr9APTJEudTtI2dN0CgYBNLDgYlbCSfsBpJl9isMQN\nMEU46AG0w7BAtEX57AgNX5NTyKbmAjIvvBWLTL7kK9aQGMihGuinqABFBEHHBHq/\nDGXxkIEpEliA8vV0hRMuJmjh7Vv399wflQ//CoehpK45QRlluuzXB9L8/quHgJjR\nZlrkz2XuX5Jc/CvZZMrhhQ==\n-----END PRIVATE KEY-----\n',
-        #     "client_email": 'm-outlet-executor@m-outlet-notifier.iam.gserviceaccount.com',
-        #     "client_id": '107968884044693374438',
-        #     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-        #     "token_uri": "https://oauth2.googleapis.com/token",
-        #     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-        #     "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/m-outlet-executor%40m-outlet-notifier.iam.gserviceaccount.com",
-        #     "universe_domain": "googleapis.com"
-        # }
 
         creds = ServiceAccountCredentials._from_parsed_json_keyfile(g_credentials, self._SCOPES)
         self.client = gspread.authorize(creds)

@@ -1,0 +1,11 @@
+python-dotenv
+pytesseract
+pillow
+tesseract
+beautifulsoup4
+selenium
+Pillow
+requests
+oauth2client
+google-api-python-client
+gspread

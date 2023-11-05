@@ -17,6 +17,13 @@ password = os.environ['PASSWORD']
 
 
 def send_success_mail(app_name, img_file_path, base_url, img_text: str, img_before, matching_regex):
+    '''
+    Send a success Email, whenever a new image has a match with the regex rules.
+    The Email will contain the following:
+    - The image itself.
+    - all the matched rules.
+    - the extracted text.
+    '''
     # save image
     img_before.save(img_file_path)
 
@@ -71,6 +78,9 @@ def send_success_mail(app_name, img_file_path, base_url, img_text: str, img_befo
 
 
 def send_failed_mail(e, subject: str, app_name):
+    '''
+    Failing mail containing the error message 'e'
+    '''
     email = EmailMessage()
     email["From"] = app_name
     email["To"] = recipient

@@ -10,8 +10,8 @@ from PIL import Image
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
-from emailService import send_success_mail, send_failed_mail
-from googleDriveService import GoogleDriveService
+from services.emailService import send_success_mail, send_failed_mail
+from services.googleDriveService import GoogleDriveService
 
 
 # https://stackoverflow.com/a/61157968
@@ -21,32 +21,36 @@ chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--disable-dev-shm-usage')
 driver = webdriver.Chrome(options=chrome_options)
 
+# Basic config
 app_name = 'M-Outlet Notifier'
 img_file_path = 'image.png'
 base_url = "https://zuerich.migros.ch/de/outlet-migros.html"
 image_base_url = 'https://zuerich.migros.ch'
+gspread_image_date_file_id = '1FNzPArr137RIT_kW_70m2l68S7kxKC8kp51tCeM8mOU'
 
 driver.get(base_url)
 content = driver.page_source
 soup = BeautifulSoup(content)
 
 
-
-# regex rules
-reges_rules = [
+# REGED Rules it needs to match
+regex_rules = [
     'spiel',
     'lego',
-
-    ## testing
-    'glih',
-    # 'ochen',
+    'klemmbau',
+    'steine'
 ]
 
 
 
 def extract_text(html_image):
+    '''
+    Extract text from the scraped image. 
+    It gets the big image first for better resolution.
+    '''
+
     image_url_small = image_base_url + html_image['src']
-    # replace 'small' with 'large' in URL
+    # replace 'small' with 'large' in URL -> get the big image.
     image_url_big = image_url_small.replace('small', 'large', 1)
 
     image_content_big = requests.get(image_url_big).content
@@ -64,10 +68,14 @@ def extract_text(html_image):
     return text, image_big, image_small 
 
 
-def find_regex_rules(extracted_text):
+def find_regex_rules(extracted_text: str):
+    '''
+    Search for any appearances of the global regex rules
+    within the provided text.
+    '''
     matches = []
 
-    for rr in reges_rules:
+    for rr in regex_rules:
         match = re.search(rr, extracted_text, re.IGNORECASE)
         if match:
             matches.append(rr)
@@ -75,6 +83,9 @@ def find_regex_rules(extracted_text):
     return matches
 
 def clean_up():
+    '''
+    General clean up task at the end of the app.
+    '''
     if os.path.exists(img_file_path):
         os.remove(img_file_path)
     
@@ -84,20 +95,11 @@ if __name__ == "__main__":
     load_dotenv()
 
     googleDriveService = GoogleDriveService()
-
-    # selected_fields="files(id,name,webViewLink)"
-    # list_file=gdriveService.files().list(fields=selected_fields).execute()
-
-    # Get latest stored image_url
-    # get new image url
-    # 
-
-    gd_latest_image_url = googleDriveService.get_latest_image_url('1FNzPArr137RIT_kW_70m2l68S7kxKC8kp51tCeM8mOU')
-    # curr_image_url =
-    print()
+    gd_latest_image_url = googleDriveService.get_latest_image_url(gspread_image_date_file_id)
 
 
-
+    # Sometimes browser was not ready -> img source is not found.
+    # Multiple tries heuristicly leads to a mostly succesful run.
     max_tries = 5
     t_count = 0
 
@@ -113,6 +115,7 @@ if __name__ == "__main__":
             image_url_small = image_base_url + html_image['src']
 
             if gd_latest_image_url != image_url_small:
+                # New Image found
                 print(f'Found new image on the website with URL: {image_url_small}')
 
                 try:
@@ -139,5 +142,5 @@ if __name__ == "__main__":
         send_failed_mail(f'Looped more than {max_tries}', 'Loop end', app_name)
 
     clean_up()
-    print("Done")
+    print("M-Scheduler has run through.")
 

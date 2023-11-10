@@ -106,7 +106,8 @@ if __name__ == "__main__":
     image_scrape_success = False
 
     while t_count < max_tries:
-        html_images = soup.find_all('img', attrs={'class': 'image lazyloaded'})
+        html_images = soup.find_all('img', attrs={'src': re.compile(r'(KW\d\d)')})
+        # html_images = soup.find_all('img', attrs={'class': 'image lazyloaded'})
 
         if len(html_images) == 1:
             # Image found

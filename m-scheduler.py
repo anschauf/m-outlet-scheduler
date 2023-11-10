@@ -137,7 +137,7 @@ if __name__ == "__main__":
                 t_count = max_tries
         else:
             t_count += 1
-            print(f'Image scrape try #{t_count}')
+            print(f'Image scrape try #{t_count}. Found {len(html_images)} images')
     
     if not image_scrape_success and t_count >= max_tries:
         print(f'Looped more than {max_tries}')

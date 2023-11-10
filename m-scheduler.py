@@ -137,8 +137,10 @@ if __name__ == "__main__":
                 t_count = max_tries
         else:
             t_count += 1
+            print(f'Image scrape try #{t_count}')
     
     if not image_scrape_success and t_count >= max_tries:
+        print(f'Looped more than {max_tries}')
         send_failed_mail(f'Looped more than {max_tries}', 'Loop end', app_name)
 
     clean_up()

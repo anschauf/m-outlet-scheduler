@@ -75,7 +75,7 @@ class GoogleDriveService:
 
         # Update the end date of the old action, if empty.
         if len(latest_end_date) <= 0:
-            img_data_sheet.update_cell(row=len(rows), col=2, value=today_date)
+            img_data_sheet.update_cell(row=len(rows) + 1, col=3, value=today_date)
 
         # Append new action.
         img_data_sheet.append_row(body)

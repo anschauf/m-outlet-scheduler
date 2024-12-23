@@ -39,7 +39,8 @@ regex_rules = [
     'lego',
     'klemmbau',
     'steine',
-    'non.?food' # non-food in any variation in-between space, e.g. non-food, nonfood, non food
+    'non.?food', # non-food in any variation in-between space, e.g. non-food, nonfood, non food
+    'black.?week'
 ]
 
 

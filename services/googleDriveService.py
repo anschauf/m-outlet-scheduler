@@ -97,7 +97,7 @@ class GoogleDriveService:
             now_year = curr_date.strftime("%Y")
 
             # extract the kalenderwoche info e.g. 'kw44'
-            kw_and_numb = re.search('(KW\d\d).\w{3}', image_url_small).group(0)
+            kw_and_numb = re.search('((KW|kw)\d\d).\w{3}', image_url_small).group(0)
             file_name = f'm_outlet_{now_year}_{kw_and_numb}'
             
             file_metadata = {'name': file_name, 'parents': [self.gdrive_img_folder]}

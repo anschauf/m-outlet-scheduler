@@ -101,7 +101,7 @@ class GoogleDriveService:
             file_name = f'm_outlet_{now_year}_{kw_and_numb[:4].upper()}'
             
             file_metadata = {'name': file_name, 'parents': [self.gdrive_img_folder]}
-            mime_type = f'image/{kw_and_numb[-3:]}'
+            mime_type = f'image/{image_url_small[-3:]}'
             media = MediaFileUpload(local_img_path, mimetype=mime_type)
 
             # Upload to Google Drive
